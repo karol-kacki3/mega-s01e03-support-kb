@@ -1,0 +1,97 @@
+---
+layout: runbook
+title: '#4471 review · separate failures, not matching subjects'
+owner: karol-kacki3
+status: proposed
+reviewed: '2026-11-01'
+signature: 'karol-kacki3 / OpenCode / github-copilot/gpt-6.1-sol / S01E03'
+---
+
+<script>
+  import IncidentReview from '#lib/kb/IncidentReview.svelte';
+  import QueueTimeline from '#lib/kb/QueueTimeline.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+## Scope and evidence
+
+This review uses the export dated 4 October 2026, not the desk's current queue.
+Report IDs count reports, not customers, bookings, or independent incidents.
+The source ticket's prose says one known bug; its components and source data do not support that claim.
+Read the report bodies, tenant directory, classifier, and queue timestamps together.
+
+<IncidentReview />
+
+## Parser failure
+
+The shared parser reads month first for tenants whose locale writes day first.
+For example, R-41200 from Harbour Dental (`en-GB`, `booking-v2`, app) describes
+7 April becoming 4 July. R-41205 belongs to Morrow Tax (`fr-FR`), even though
+its browser locale is `en-US` and intake calls it `hint`: the tenant's configuration matters.
+
+Reproduce by passing `07/04/2026` as a day-first tenant's date through the shared
+app/email parser. Expected: 7 April. Reported: 4 July. The export describes this behavior;
+it does not contain the product executable, so this is a proposed reproduction, not a test we ran.
+Make parsing follow an explicit tenant date contract. Check ambiguous dates, unambiguous
+day-first dates, month-first tenants, and locale switching before closing the ticket.
+
+## Form hint failure
+
+`booking-v3` prints `MM/DD/YYYY` but reads the form in a day-first tenant's order.
+This is not the same failure as the shared parser. Copper Studio, Alder Physio, and
+Pale Harbour use that form. Their app/email reports still follow the parser path.
+R-41230 is a Copper Studio form report tagged `parser` by intake, but the tenant/form
+combination places it in the hint group.
+
+Reproduce in a day-first `booking-v3` form: follow the month-first hint and enter
+`01/06/2026` intending 6 January. Expected: 6 January. With day-first reading: 1 June.
+Make the visible hint and validation agree with the tenant's date contract; test the form
+separately from the app/email parser. A parser-only fix cannot establish that the hint is fixed.
+
+## Unresolved observations are not a proven third cause
+
+The desk notes identify reports that the classifier files as parser but whose bodies do not
+demonstrate a month/day swap. One describes different days for Lisbon and Toronto;
+another says an invite arrived before the booking. Keep these in a separate investigation
+ticket rather than calling them confirmed parser failures or declaring a timezone bug proved.
+
+Obtain the original entered date, event identifier, stored instant, timezone, all-day flag,
+invite payload, and creation/delivery timestamps. Compare local-date preservation and
+UTC conversion, including DST boundaries, without assuming they explain every report.
+R-41236 needs a separate chronology check within this investigation. Split it further if evidence
+establishes independent mechanisms. Reassign each report once, preserving its ID and audit trail.
+
+## Replace subject-only triage
+
+The accepted [decision 0001](/kb/decisions/0001-dedupe-by-subject) remains an historical record;
+this proposed review does not silently edit or declare it superseded.
+Its subject-only rule can merge different failures and separate duplicates of the same failure.
+The executable `sameCause` function instead checks tenant locale, form, and channel.
+Even that rule needs a body-level exception for contradictory observations.
+
+Proposed triage: deduplicate export rows by report ID, inspect the body and tenant's configuration,
+and group by supported failure mechanism. Keep uncertain reports in investigation. Similar
+subjects, browser locales, or intake tags alone are not sufficient evidence for merging.
+Seek desk approval for a new decision record before replacing the accepted operational policy.
+
+## The queue did not stop when the desk marked the ticket known
+
+<QueueTimeline ticket={4471} />
+
+The chart computes reports received and reports merged separately from their timestamps.
+The July merge batch is not the start of the failures: reports had already arrived in April.
+Reports continue through the export's final date. A queued fix and a known status do not prove
+resolution. R-41620 says its author stopped reporting; report volume alone cannot measure recovery.
+The export cannot establish what happened after its snapshot. Read fresh desk data before
+closing or treating these counts as current. Keep the source data unchanged so review remains auditable.
+
+## Follow-up and verification
+
+The [public review repo](https://github.com/karol-kacki3/mega-s01e03-support-kb) contains
+one ticket per finding, disjoint report lists, and a testable report-counting routine.
+Run `node --test scripts/incident-review.test.mjs` from its root to check the classification,
+duplicate handling, and anomaly separation. Run `node scripts/prepare-tickets.mjs` to regenerate
+the local ticket drafts from the source snapshot. Counts on this page belong in its component,
+not handwritten totals that can drift. A new export requires a new review of the anomaly list too.
+
+<RenderStamp {signature} />
