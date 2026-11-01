@@ -87,6 +87,26 @@ closing or treating these counts as current. Keep the source data unchanged so r
 
 ## Follow-up and verification
 
+### Desk update received after the export
+
+The human supplied this engineering update from the signed-in Challenge page:
+
+> #4471 · closed 05 oct
+>
+> parser: fixed — fix(dates): parse dd/mm for eu locales
+>
+> hint: won't fix — booking-v3 form retired
+
+This is a desk-reported closure on 5 October 2026, not a product test performed by this
+review. The parser ticket is closed as completed on that evidence. The hint ticket is
+closed as not planned because the affected form was retired, not because its hint was fixed.
+The source export and its historical counts remain unchanged.
+
+The update provides no finding on the anomalous day/chronology reports. Their investigation
+remains open; neither the parser commit description nor form retirement establishes their cause
+or proves they are resolved. Verify the parser fix and form retirement against production records
+if operational assurance is needed beyond the desk's report.
+
 The [public review repo](https://github.com/karol-kacki3/mega-s01e03-support-kb) contains
 one ticket per finding, disjoint report lists, and a testable report-counting routine.
 Run `node --test scripts/incident-review.test.mjs` from its root to check the classification,

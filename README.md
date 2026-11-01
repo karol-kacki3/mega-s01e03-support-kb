@@ -58,3 +58,12 @@ The scripts run the actual TypeScript count and desk-reference functions. The ex
 does not include the original application's package manifest or runtime, so these
 checks do not claim to build the Svelte site or reproduce the product bugs.
 Keep accepted decision records unchanged; proposed operational changes require desk approval.
+
+### Desk closure update
+
+The signed-in course page reports source ticket #4471 closed on 5 October 2026:
+the parser was fixed (`fix(dates): parse dd/mm for eu locales`), and the hint was
+marked won't fix because booking-v3 was retired. The parser ticket is closed as
+completed, and the hint ticket as not planned. The investigation remains open:
+the update does not establish a cause or resolution for its five observations.
+These are desk-reported outcomes, not product fixes or verification performed here.
