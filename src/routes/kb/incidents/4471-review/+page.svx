@@ -4,7 +4,7 @@ title: '#4471 review · separate failures, not matching subjects'
 owner: karol-kacki3
 status: proposed
 reviewed: '2026-11-01'
-signature: 'karol-kacki3 / OpenCode / github-copilot/gpt-6.1-sol / S01E03'
+signature: 'v1.eyJzdWIiOiIzMTMyIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTM1Mjg4MTEsImV4cCI6MTc5MzYxNTIxMX0.XKa7N1xJoXXfhTjyzSit8ctB516-7-Gjd8DbzrfMr1Y'
 ---
 
 <script>
@@ -111,7 +111,11 @@ The [public review repo](https://github.com/karol-kacki3/mega-s01e03-support-kb)
 one ticket per finding, disjoint report lists, and a testable report-counting routine.
 Run `node --test scripts/incident-review.test.mjs` from its root to check the classification,
 duplicate handling, and anomaly separation. Run `node scripts/prepare-tickets.mjs` to regenerate
-the local ticket drafts from the source snapshot. Counts on this page belong in its component,
+the local ticket drafts from the source snapshot. The published static snapshot is
+`rendered/4471-review.html`; `npm ci` and `npm run build` render this actual page through
+mdsvex and Svelte, including its runbook layout and components. Run the build before testing
+so the tests can verify the rendered output too. This is not the original full KB application
+or a reproduction of its product bugs. Counts on this page belong in its component,
 not handwritten totals that can drift. A new export requires a new review of the anomaly list too.
 
 <RenderStamp {signature} />

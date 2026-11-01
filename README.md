@@ -55,9 +55,26 @@ node scripts/prepare-tickets.mjs
 ```
 
 The scripts run the actual TypeScript count and desk-reference functions. The export
-does not include the original application's package manifest or runtime, so these
-checks do not claim to build the Svelte site or reproduce the product bugs.
+does not include the product executable, so these checks do not reproduce product bugs.
 Keep accepted decision records unchanged; proposed operational changes require desk approval.
+
+### Render the actual signed page
+
+The review adds a standalone Svelte/mdsvex server-rendering build for this source-only
+export. It compiles the actual `.svx`, shared runbook layout, and imported components;
+it is not a handwritten HTML substitute or a recreation of the original full application.
+
+```sh
+npm ci
+npm run build
+npm test
+```
+
+The output committed for the desk is `rendered/4471-review.html`. Download and open it
+in a browser to read the styled static snapshot. Its counts, timeline, and signature
+stamp come from the real components and source data. Internal `/kb` links refer to the
+original KB routes; this snapshot does not deploy those routes or interactive navigation.
+Build dependencies and intermediate bundles are ignored; the lockfile is committed.
 
 ### Desk closure update
 

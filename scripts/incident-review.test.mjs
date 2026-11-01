@@ -58,3 +58,18 @@ test('signed review uses the real stamp function and required page structure', (
   assert.ok(page.trimEnd().endsWith('<RenderStamp {signature} />'));
   console.log(`Review desk ref: ${deskRef(signature)}`);
 });
+
+test('published HTML is signed and contains the computed findings and desk dispositions', () => {
+  const html = fs.readFileSync(new URL('../rendered/4471-review.html', import.meta.url), 'utf8');
+  const page = fs.readFileSync(new URL('../src/routes/kb/incidents/4471-review/+page.svx', import.meta.url), 'utf8');
+  const signature = page.match(/^signature: '([^']+)'$/m)[1];
+  assert.ok(html.includes(deskRef(signature)));
+  assert.ok(!html.includes('no desk ref'));
+  assert.ok(!html.includes(signature));
+  for (const count of [374, 33, 5]) assert.ok(html.includes(`<td>${count}</td>`));
+  for (const id of notes.oneDayMove) assert.ok(html.includes(id));
+  assert.ok(html.includes('booking-v3 form retired'));
+  assert.ok(html.includes('fix(dates): parse dd/mm for eu locales'));
+  assert.ok(html.includes('Their investigation'));
+  assert.ok(html.includes('remains open'));
+});
